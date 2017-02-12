@@ -1,0 +1,51 @@
+ <!doctype html>
+<html>
+<head>
+    <title> facevook</title>
+<style>
+    body {
+margin: 0px;
+padding: 0px; 
+}
+    </style>
+</head>
+<body>
+
+<canvas id="myCanvas" width="200" height="200"></canvas>
+    <script>        
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+        context.fillStyle = "#3B5998";
+        context.beginPath();
+        context.fillRect(0,0,200,200);
+        context.fill();
+        
+         context.fillStyle = "#ffffff";//ㅡ
+        context.moveTo(81, 93);
+        context.lineTo(81, 123);
+        context.lineTo(165, 123);
+        context.lineTo(170, 93);
+        context.closePath();
+        context.fill();
+        
+         context.fillStyle = "#ffffff";//ㅣ
+        context.beginPath();
+        context.fillRect(108,71,30,129);
+        context.fill();
+        
+         context.fillStyle = "#ffffff";//ㅁ
+        context.beginPath();
+        context.fillRect(146,30,24,30);
+        context.fill();
+        
+        context.fillStyle= "#ffffff";//r
+        context.beginPath();
+        context.moveTo(108, 71);
+        context.quadraticCurveTo(107, 30, 146, 30);
+        context.lineTo(146, 60);
+        context.quadraticCurveTo(136, 60, 138, 71);
+        context.fill();
+    //큰곡선-108, 71-146, 30 작은곡선-138, 71 - 146, 30
+    </script>
+</body>
+</html>

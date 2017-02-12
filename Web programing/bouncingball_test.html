@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bouncing Ball Example</title>
+    <style>
+        canvas {
+            background: #38c1d3;
+        }
+    </style>
+    <script>
+        var context;
+        var dx = 5;
+        var dy = 5;
+        var y = 100;
+        var x = 100;
+        var dx2 = 15;
+        var dy2 = 5;
+        var y2 = 100;
+        var x2 = 100;
+        function draw() {
+            var canvas = document.getElementById('myCanvas');
+            var context = canvas.getContext('2d');
+            context.clearRect(0, 0, 300, 200);
+            context.beginPath();
+            
+            context.fillStyle = "#973fe3";
+            context.arc(x, y, 15, 0, Math.PI * 2, true);
+            context.closePath();
+            context.fill();
+            
+            context.arc(x2, y2, 15, 0, Math.PI * 2, true);
+            context.closePath();
+            context.fill();
+            
+            context.moveTo(x, 0);
+            context.lineTo(x, 200);
+            context.stroke();
+            context.moveTo(0, y);
+            context.lineTo(300, y);
+            context.stroke();
+            context.moveTo(x2, 0);
+            context.lineTo(x2, 200);
+            context.stroke();
+            context.moveTo(0, y2);
+            context.lineTo(300, y2);
+            context.stroke();
+            context.closePath();
+            if (x2 < (0 + 15) || x2 > (300 - 15))
+                dx2 = -dx2;
+            if (y2 < (0 + 15) || y2 > (200 - 15))
+                dy2 = -dy2;
+            x2 += dx2;
+            y2 += dy2;
+            if (x < (0 + 15) || x > (300 - 15))
+                dx = -dx;
+            if (y < (0 + 15) || y > (200 - 15))
+                dy = -dy;
+            x += dx;
+            y += dy;
+        }
+        setInterval(draw, 16);
+    </script>
+</head>
+<body>
+<canvas id="myCanvas" width="300" height="200"></canvas>
+</body>
+</html>
