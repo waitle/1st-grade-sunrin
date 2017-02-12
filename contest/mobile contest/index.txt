@@ -1,0 +1,27 @@
+coding - 게시판
+delete - 회원탈퇴
+index.html - index,php 리다이렉션
+index,php 로그인창
+login.php 로그인처리->db연동
+logout.php 로그아웃 처리는 쿠키값 삭제, 로그인된 상태로 index.php 들어가면 쿠키 존재해서 coding.php 로 리다이렉션됨
+process.php 회원가입 db연동
+registerphp 회원가입 입력받는 창
+showcode.php 게시물 볼때
+write.php 게시물 쓰는 창
+writeprocess 게시물 쓸떄 db 연동
+wrtieprocess2 게시물 수정할 때 db연동 끝
+
+배경화면은 어디다가 넣으면 되
+전부다 ㄱㄱ
+ㅇㅋ css 따로 안빼서
+일일히넣어야됫듯
+어차피 코드안기니깐 금바됩 ㅇㅋ 하이라이팅 연구해봄 배경부터 ㄱㄱ 구글에
+syntax hilighting 치면 많이나옴
+ㅃㅃ
+ html { 
+  background: url('background.png') no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
