@@ -1,0 +1,62 @@
+#incldue <stdio.h>
+
+struct Date
+{
+	int year, min, day;
+}
+
+
+
+int main()
+{
+	struct Date days[3] ={
+		{1998, 1, 5},
+		{2000, 8, 12},
+		{1999, 11, 3}};
+struct Date * date_ptr;
+date_ptr=days;
+
+}
+
+
+----------------------
+
+struct person{
+char *name;int age;
+};
+
+struct person memset(char *name, int age)
+{
+	struct person tmp;
+	tmp.age = age;
+	tmp.name = name;
+}
+
+int main()
+{
+	struct person kim;
+	kim = memset("±è", 1);
+	printf("%s", kim.name);
+	printf("%d", kim.age);
+}
+
+-------------------
+
+void fun(struct person p)
+{
+	p.name="dfsd";
+	p.age=12;
+	printf("in");
+	printf("%S %d \n", p.name, p.age);
+}
+
+int main()
+{
+	struct person kim = ("kim", 12);
+	fun(%kim);
+	printf("in main, ");
+	printf("%s, %d\n", kim.name, kim.age);
+}
+
+----------------
+

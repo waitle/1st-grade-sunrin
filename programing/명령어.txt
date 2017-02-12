@@ -1,0 +1,36 @@
+mkdir adir
+ls -l
+cd adir
+cat >file1
+cat >file2
+ls -l
+chmod u+x file1
+chmod o+w file2
+chmod a-wx file1
+chmod ug+x file2
+
+chmod 000 file1,file2
+chmod 660 file1
+chmod 0755 file2ch
+c
+cd ..
+ls
+cdls 
+cat >test 
+ls -l
+vi ./test
+chmod u+x test
+vi ./test
+
+chown ubuntu:sunrin test
+exit
+ls /root/documents/test
+ls -l /root 
+su
+cd documents
+cp -p test testcp
+exit
+ls -l
+cd documents
+chmod 777 test
+chown root test
