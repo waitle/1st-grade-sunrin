@@ -1,0 +1,11 @@
+동기
+작품, 기능소개
+느낀점
+
+파일이름 : filename
+파일크기 : filesize
+파일경로 : filearray
+파일 스트림 포인터 :
+reference : 참조
+
+ega0e@naver.com

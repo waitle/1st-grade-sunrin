@@ -1,0 +1,587 @@
+#define START_PORT 30000
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <winsock2.h>
+#include <conio.h>
+#include <strsafe.h>
+#include "fmod.hpp"
+#pragma   comment (lib, "fmodex_vc.lib")
+using namespace FMOD;
+
+#pragma comment(lib, "ws2_32.lib")
+char filepath[128] = "C:\\CloudFiles";
+
+System* pSystem;
+Sound* pSound[2];
+Channel* pChannel[2];
+int CURSORY = 18;
+int isplaying = 0;
+char mp3name[64] = {};
+
+COORD getXY();
+void gotoxy(int x, int y);
+char selectmenu();
+int writeFile(char* filename, int filesize, char* filearray);
+int cleaning(char *response);
+void portopen(char c, int port);
+void ErrorHandling(char *message);
+int readFile(char *filename, int* filesize, char** filearray);
+int filelist(char** list_file);
+
+int filelist(char** list_file)
+{
+	WIN32_FIND_DATA ffd;
+	LARGE_INTEGER filesize;
+	size_t length_of_arg;
+	HANDLE hFind = INVALID_HANDLE_VALUE;
+	char szDir[MAX_PATH] = {}, path[256] = {}, temp[256] = {};
+	char* buffer;
+	int count_folder = 0, count_file = 0;
+
+	strcpy(path, filepath);
+	length_of_arg = strlen(path);
+
+	if (length_of_arg > (MAX_PATH - 3))
+	{
+		printf("\n폴더명이 너무 깁니다.\n");
+		return (-1);
+	}
+
+	strcpy(szDir, path);
+	strcat(szDir, "\\*"); //(입력한경로)\*
+
+	hFind = FindFirstFile(szDir, &ffd);
+
+	if (length_of_arg > (MAX_PATH - 3)) //폴더명이 너무 긴경우
+		return (-1);
+
+	if (INVALID_HANDLE_VALUE == hFind) //실패할경우
+		return -1;
+
+	buffer = (char*)malloc(4096);
+	memset(buffer, NULL, 4096);
+	do
+	{
+		if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) //만약 폴더인경우
+		{
+			sprintf(temp, "   %-60s   <폴더>\n", ffd.cFileName);
+			strcat(buffer, temp);
+			count_folder++;
+		}
+		else
+		{
+			filesize.LowPart = ffd.nFileSizeLow;
+			filesize.HighPart = ffd.nFileSizeHigh;
+			sprintf(temp, "   %-60s   %-8lld 바이트\n", ffd.cFileName, filesize.QuadPart);
+			strcat(buffer, temp);
+			count_file++;
+		}
+		if (strlen(buffer) > 4000)
+		{
+			printf("내용이 너무 많습니다. 종료합니다\n");
+			*list_file = buffer;
+			FindClose(hFind);
+			return -1;
+		}
+	} while (FindNextFile(hFind, &ffd) != 0);
+	FindClose(hFind);
+	sprintf(temp, "\n   폴더 : %d개   파일 : %d개\n\n", count_folder, count_file);
+	strcat(buffer, temp);
+	*list_file = buffer;
+	return 0;
+}
+COORD getXY() //커서위치
+{
+	COORD Cur;
+	CONSOLE_SCREEN_BUFFER_INFO a;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &a);
+	Cur.X = a.dwCursorPosition.X;
+	Cur.Y = a.dwCursorPosition.Y;
+	return Cur;
+}
+void gotoxy(int x, int y) //커서이동
+{
+	COORD Cur;
+	Cur.X = x;
+	Cur.Y = y;
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Cur);
+}
+char selectmenu()
+{
+	int temp;
+	COORD cur = { 2,1 };
+	gotoxy(0, 0);
+	printf("┌───────MENU───────┐\n");
+	printf("│■ 종료                         │\n");
+	printf("│□ 파일 다운로드                │\n");
+	printf("│□ 파일 업로드                  │\n");
+	printf("│□ 작업 위치 보기               │\n");
+	printf("│□ 작업 위치 변경               │\n");
+	printf("│□ 서버 파일 리스트 보기        │\n");
+	printf("│□ 클라이언트 파일 리스트 보기  │\n");
+	printf("│□ 파일 삭제하기                │\n");
+	if (isplaying == 1)
+		printf("│□ mp3 정지하기                 │\n");
+	else if (isplaying == 0)
+		printf("│□ mp3 재생하기                 │\n");
+	printf("│□ 화면 지우기                  │\n");
+	printf("├────────────────┤\n");
+	printf("│이동 : ↑ ↓                    │\n");
+	printf("│선택 : 엔터                     │\n");
+	printf("└────────────────┘\n");
+	if (isplaying == 1)
+		printf("[mp3] ▶ : %s\n", mp3name);
+	else if (isplaying == 0)
+		printf("[mp3] ■ : %s\n", mp3name);
+	printf("[출력창]");
+	gotoxy(cur.X, cur.Y);
+	while (1)
+	{
+		cur = getXY();
+		temp = getch();
+		if (temp == 224)
+		{
+			temp = getch();
+			if (temp == 72)//윗방향키
+			{
+				if (cur.Y <= 1)
+				{
+					gotoxy(2, cur.Y);
+					printf("□");
+					gotoxy(2, 10);
+					printf("■");
+					continue;
+				}
+				cur.Y--;
+				gotoxy(2, cur.Y + 1);
+				printf("□");
+				gotoxy(2, cur.Y);
+				printf("■");
+			}
+			else if (temp == 80)//아랫방향키
+			{
+				if (cur.Y >= 10)
+				{
+					gotoxy(2, cur.Y);
+					printf("□");
+					gotoxy(2, 1);
+					printf("■");
+					continue;
+				}
+				cur.Y++;
+				gotoxy(2, cur.Y - 1);
+				printf("□");
+				gotoxy(2, cur.Y);
+				printf("■");
+			}
+		}
+		if (temp == 13)//엔터
+			return cur.Y - 1 + 0x30;
+	}
+}
+int writeFile(char* filename, int filesize, char* filearray)
+{
+	char filepath_full[128] = {};
+	char input;
+	FILE *rFile;
+	strcpy(filepath_full, filepath);
+	strcat(filepath_full, "\\");
+	strcat(filepath_full, filename);
+	fflush(stdin);
+	rFile = fopen(filepath_full, "r");
+	fflush(stdin);
+
+	if (rFile != NULL)
+	{
+		fclose(rFile);
+		printf("해당경로에 파일이 존재합니다. 덮어씌우시겠습니까? (y/n)\n");
+		input = getch();
+		if (input != 'y')
+			return -1;
+	}
+
+	rFile = fopen(filepath_full, "wb");
+
+	for (int i = 0; i < filesize; i++)
+		fprintf(rFile, "%c", filearray[i]);
+	fclose(rFile);
+	return 0;
+}
+int cleaning(char *response)  //리턴값 = int형 response 를 변환한값
+{
+	int response_strlen = 0, index = 0, result;
+	while (response[response_strlen] != NULL) // 쓰레기값인경우 보낸 크기보다 받을 크기가 큰경우
+		response_strlen++;
+	index = response_strlen;
+	while (index != 32) // 쓰레기값을 NULL로 채움
+	{
+		response[index] = NULL;
+		index++;
+	}
+	result = atoi(response);
+	return result;
+}
+void portopen(char c, int port)
+{
+	printf("%d port ", port);
+	if (c == '1')
+		printf("is open\n");
+	else if (c == '0')
+		printf("is close\n");
+	else if (c == '2')
+		printf("is using\n");
+	else
+		printf("is unknown\n");
+}
+void ErrorHandling(char *message)
+{
+	fputs(message, stderr);
+	fputc('\n', stderr);
+	exit(1);
+}
+int readFile(char *filename, int* filesize, char** filearray)
+{
+	char filepath_full[128] = {};
+	char *fileArray;
+	int fileSize;
+	FILE *rFile;
+	strcpy(filepath_full, filepath);
+	strcat(filepath_full, "\\");
+	strcat(filepath_full, filename);
+
+	rFile = fopen(filepath_full, "rb");
+
+	if (rFile == NULL) {
+		filesize = 0;
+		return -1;
+	}
+
+	fseek(rFile, 00, SEEK_END);
+	fileSize = ftell(rFile); // 파일크기 알아냄
+
+	*filesize = fileSize;
+	fseek(rFile, 00, SEEK_SET);
+	fileArray = (char *)malloc(fileSize + 1);//집어넣을 배열 파일크기만큼 동적할당
+	fread(fileArray, 1, fileSize, rFile);//배열에 파일내용 집어넣음
+	*filearray = fileArray;
+
+	fclose(rFile);
+	return 1;//배열값리턴
+}
+int main(int argc, char **argv)
+{
+	WSADATA wsaData;
+	SOCKET hSocket;
+	SOCKADDR_IN servAddr;
+	COORD bufferSize = { 120,3000 }; // 가로, 세로
+
+	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize);
+	System_Create(&pSystem);
+	pSystem->init(1, FMOD_INIT_NORMAL, 0);
+
+	system("mkdir C:\\ColudFiles");
+	system("mode con:cols=120 lines=300");
+	system("title client");
+	system("cls");
+
+	CONSOLE_CURSOR_INFO cursorInfo = { 0, };
+	cursorInfo.dwSize = 10;
+	cursorInfo.bVisible = FALSE;
+	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
+
+	if (argc != 3)
+	{
+		printf("Usage : %s <ip> <port>\n", argv[0]);
+		exit(1);
+	}
+
+	// Load WinSocket 2.2 DLL
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+	{
+		ErrorHandling("WSAStartup(), error");
+	}
+
+	// 서버 접속을 위한 소켓 생성
+	hSocket = socket(PF_INET, SOCK_STREAM, 0);
+	if (hSocket == INVALID_SOCKET)
+	{
+		ErrorHandling("hSocketet(), error");
+	}
+
+	memset(&servAddr, 0, sizeof(servAddr));
+	servAddr.sin_family = AF_INET;
+	servAddr.sin_addr.s_addr = inet_addr(argv[1]);
+	servAddr.sin_port = htons(atoi(argv[2]));
+
+	// 서버로 연결 요청
+	if (connect(hSocket, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
+	{
+		ErrorHandling("Connect() error");
+	}
+	// 데이터 수신 
+	int i = 1;
+	while (1)
+	{
+		if (atoi(argv[2]) == START_PORT + 16) //포트확인용 포트일경우
+			break;
+		char* data, *filearray, *list_file;
+		char filename[32] = {}, response[32] = {}, choice[2] = {}, response_upload[64] = {}, filesize_char[32], input[2] = {}, state[4] = {};
+		char fullpath[256] = {}, buffer_trash[256] = {}, mp3path[256] = {};
+		int response_strlen = 0, filesize = 0, breaksw = 0, sw = 0;
+		u_long buffer_trash_len = 0;
+		FILE* fptr;
+
+		fflush(stdin);
+
+		ioctlsocket(hSocket, FIONREAD, &buffer_trash_len); //남은 버퍼 비우기
+			recv(hSocket, buffer_trash, buffer_trash_len, NULL);
+
+		choice[0] = selectmenu();
+
+
+		fflush(stdin);
+		send(hSocket, choice, 1, NULL); //메뉴선택 Server 로 보냄
+		gotoxy(0, CURSORY);
+		switch (choice[0])
+		{
+		case '0':
+			breaksw = 1;
+			system("cls");
+			break;
+
+		case '1':
+			printf("파일이름 이름 : ");
+			gets_s(filename, 32);
+			fflush(stdin);
+			send(hSocket, filename, 32, NULL); //요청할 파일이름을 Server 로 보냄
+
+			recv(hSocket, response, 32, NULL); //파일 사이즈를 받음
+
+			filesize = cleaning(response); //데이터정렬
+
+			if (filesize == 0) //파일크기가 0이면
+			{
+				printf("해당하는 파일이 없습니다.\n\n");
+				break; //처음으로
+			}
+			else if (filesize == -1)
+			{
+				printf("50MB가 넘는 파일을 다운로드할 수 없습니다.\n\n");
+				break;
+			}
+			else if (filesize == -2)
+			{
+				printf("허용되지 않는 문자열이 포함되어있습니다.\n\n");
+				break;
+			}
+			data = (char*)malloc(filesize); //파일사이즈만큼 동적할당
+
+			recv(hSocket, data, filesize, NULL); //파일데이터 수신
+
+			if (writeFile(filename, filesize, data) == -1)
+				sw = 1;
+
+			free(data);
+			if (sw == 1)
+			{
+				send(hSocket, "N", 1, NULL);
+				break;
+			}
+
+			send(hSocket, "K", 1, NULL);
+			printf("%s 를 다운로드했습니다.\n\n", filename);
+			break;
+
+		case '2':
+			printf("파일이름 입력 : ");
+			gets_s(filename, 32);
+			fflush(stdin);
+			strcat(fullpath, filepath);
+			strcat(fullpath, "\\");
+			strcat(fullpath, filename);
+
+			fptr = fopen(fullpath, "r");
+			send(hSocket, filename, 32, NULL);    //생성할 파일이름을 Server 로 보냄
+
+			recv(hSocket, state, 1, NULL); //K 받음
+
+			if (state[0] == 'N')
+			{
+				printf("허용되지 않는 문자열이 포함되어있습니다.\n\n");
+				break;
+			}
+			if (fptr == NULL)
+			{
+				send(hSocket, "1", 4, NULL); //상태
+				printf("없는 파일입니다.\n\n");
+				break;
+			}
+			fclose(fptr);
+
+			readFile(filename, &filesize, &filearray);
+
+			if (filesize > 52428000) //50MB 이상일경우
+			{
+				send(hSocket, "-1", 4, NULL);
+				free(filearray);
+				printf("50MB가 넘는 파일을 업로드할 수 없습니다.\n\n");
+				break;
+			}
+			send(hSocket, "0", 4, NULL);
+			recv(hSocket, state, 4, NULL);
+			cleaning(response_upload);
+
+			if (state[0] == '2') //있는 파일일경우
+			{
+				printf("이미 존재하는 이름입니다. 덮어씌우시겠습니까? (y/n)\n\n");
+				input[0] = getch();
+				send(hSocket, input, 1, NULL);
+				if (input[0] != 'y')
+					break;
+			}
+
+			itoa(filesize, filesize_char, 10);
+			send(hSocket, filesize_char, 32, NULL); //파일사이즈 보냄
+
+			recv(hSocket, state, 4, NULL);
+			send(hSocket, filearray, filesize, NULL); //데이터 보냄
+			free(filearray);
+			recv(hSocket, state, 1, NULL);
+			printf("%c", state[0]);
+			printf("%s 를 업로드했습니다.\n\n", filename);
+			break;
+
+		case '3':
+			printf("현재 작업 위치 경로 : %s\n\n", filepath);
+			break;
+
+		case '4':
+			memset(filepath, NULL, 128);
+			printf("작업 위치 경로 입력 : ");
+			gets_s(filepath, 128);
+			fflush(stdin);
+			printf("작업 위치를 변경했습니다.\n\n");
+			break;
+
+		case '5':
+			recv(hSocket, filesize_char, 8, NULL);
+			filesize = cleaning(filesize_char);
+			if (filesize == 0)
+			{
+				printf("경로를 탐색할 수 없습니다\n\n");
+				break;
+			}
+			send(hSocket, "K", 1, NULL);
+			list_file = (char*)malloc(65535);
+			memset(list_file, NULL, 65535);
+			Sleep(100);
+			recv(hSocket, list_file, 65535, NULL);
+			printf("%s", list_file);
+			free(list_file);
+			break;
+
+		case '6':
+			filelist(&list_file);
+			printf("%s", list_file);
+			free(list_file);
+			break;
+
+		case '7':
+			printf("파일 이름 입력 : ");
+			gets_s(filename, 32);
+			send(hSocket, filename, 32, NULL);
+			recv(hSocket, response, 4, NULL);
+			if (response[0] == '0')
+				printf("없는 파일입니다.\n\n");
+			else if (response[0] == '1')
+				printf("파일을 삭제했습니다.\n\n");
+			else if (response[0] == 'N')
+				printf("허용되지 않는 문자열이 포함되어있습니다.\n\n");
+			break;
+
+		case '8':
+			if (isplaying == 0)
+			{
+				send(hSocket, "0", 4, NULL);
+				recv(hSocket, state, 1, NULL);
+				printf("노래 제목 입력 : ");
+				memset(mp3name, NULL, 64);
+				gets_s(mp3name, 64);
+				CURSORY += 2;
+				if (strstr(mp3name, ".mp3") == NULL)
+					strcat(mp3name, ".mp3");
+				send(hSocket, mp3name, 64, NULL);
+				recv(hSocket, state, 1, NULL);
+				strcpy(mp3path, filepath);
+				strcat(mp3path, "\\");
+				strcat(mp3path, mp3name);
+
+				fptr = fopen(mp3path, "r");
+				if (fptr == NULL)
+				{
+					printf("없는 파일입니다.\n\n");
+					memset(mp3name, NULL, 64);
+					send(hSocket, "1", 1, NULL);
+					break;
+				}
+				fclose(fptr);
+				pSystem->createSound(mp3path, FMOD_LOOP_OFF | FMOD_HARDWARE, 0, &pSound[1]);
+				pSystem->playSound(FMOD_CHANNEL_REUSE, pSound[1], 0, &pChannel[1]);
+				gotoxy(6, 15);
+				printf("▶ : %s", mp3name);
+				gotoxy(0, CURSORY);
+				isplaying = 1;
+				send(hSocket, "0", 4, NULL);
+			}
+			else if (isplaying == 1)
+			{
+				send(hSocket, "1", 4, NULL);
+				recv(hSocket, state, 1, NULL);
+				send(hSocket, mp3name, 64, NULL);
+				pChannel[1]->stop();
+				gotoxy(6, 15);
+				printf("■");
+				gotoxy(0, CURSORY);
+				isplaying = 0;
+			}
+
+			break;
+
+		case '9':
+			system("cls");
+			CURSORY = 18;
+			continue; //Y값 누적시키지 않기 위해
+
+		default:
+			printf("올바르지 않은 입력 입니다.\n\n");
+			break;
+		}
+		if (breaksw == 1)
+			break;
+		COORD temp = getXY();
+		CURSORY = temp.Y;
+	}
+	// 연결 종료   
+	char port[16] = {};
+	sprintf(port, "%d", START_PORT + 16);
+	if (strcmp(argv[2], port) == 0)
+	{
+		char buf[256] = {};
+		recv(hSocket, buf, 256, 0);
+		Sleep(100);
+		for (int i = 0; i < 16; i++)
+		{
+			portopen(buf[i], START_PORT + i);
+		}
+	}
+	closesocket(hSocket);
+	WSACleanup();
+	pSound[1]->release();
+	pSystem->release();
+	pSystem->close();
+
+	return 0;
+}

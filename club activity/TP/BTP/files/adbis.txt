@@ -1,0 +1,18 @@
+폼에는 키입력 핸들러
+{
+	if 
+else if
+내캐릭터.move(x,y);
+
+if 상대방의 움직임이 포착됨
+상대방캐릭터.move(x,y);
+
+}
+
+캐릭터를 움직이는 함수가있어
+
+public void move(int x,int y)
+{
+	this.x = x ;
+	this.y = y;
+}
