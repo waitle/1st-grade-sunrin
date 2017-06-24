@@ -10,3 +10,9 @@ C:\Users\rlaxo\OneDrive\Documents\Club Activity\TP\BTP\newuser\newuser\newuser\o
 C:\Users\rlaxo\OneDrive\Documents\1st-grade-sunrin\Club Activity\TP\BTP\newuser\newuser\newuser\bin\Release\newuser.exe.config
 C:\Users\rlaxo\OneDrive\Documents\1st-grade-sunrin\Club Activity\TP\BTP\newuser\newuser\newuser\obj\Release\newuser.exe
 C:\Users\rlaxo\OneDrive\Documents\1st-grade-sunrin\Club Activity\TP\BTP\newuser\newuser\newuser\obj\Release\newuser.pdb
+C:\Users\rlaxo\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\bin\Release\newuser.exe
+C:\Users\rlaxo\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\bin\Release\newuser.pdb
+C:\Users\rlaxo\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\obj\Release\newuser.csprojResolveAssemblyReference.cache
+C:\Users\rlaxo\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\obj\Release\newuser.Form1.resources
+C:\Users\rlaxo\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\obj\Release\newuser.Properties.Resources.resources
+C:\Users\rlaxo\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\obj\Release\newuser.csproj.GenerateResource.Cache
