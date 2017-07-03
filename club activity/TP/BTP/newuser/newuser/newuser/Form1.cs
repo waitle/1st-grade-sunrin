@@ -12,14 +12,8 @@ namespace newuser
         {
             InitializeComponent();
         }
-        static PictureBox[,] floooor = new PictureBox[15, 15];
-        static PictureBox[,] Bubbles = new PictureBox[15, 15];
-        static PictureBox[,] splash = new PictureBox[15, 15];
-        ArrayList list = new ArrayList();
-        ArrayList midlist = new ArrayList();
-        static ArrayList lastlist = new ArrayList();
         static int x, y;
-
+        map mymap = new map();
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
 
@@ -135,11 +129,12 @@ namespace newuser
             System.Windows.Forms.Timer timer1 = new System.Windows.Forms.Timer();
             inputdata data = new inputdata();
 
-            data = new inputdata();
+            hero myhero = new hero(this);
+            data = new inputdata();//이거
             data.key = Keys.Space;
             data.stat = 0;
             list.Add(data);
-            
+
             data = new inputdata();
             data.key = Keys.Right;
             data.stat = 0;
@@ -228,11 +223,34 @@ namespace newuser
             timer1.Interval = 50;
             timer1.Start();
             timer1.Tick += new EventHandler(timer1_Tick);
-            hero myhero = new hero(this);
 
             for (y = 0; y < 15; ++y)
                 for (x = 0; x < 15; ++x)
                 {
+                    if (map[y, x] == 1)
+                    {
+                        blocks[y, x] = new PictureBox();//이거
+                        blocks[y, x].SizeMode = PictureBoxSizeMode.StretchImage;
+                        blocks[y, x].Location = new Point(y * 40, x * 40);
+                        blocks[y, x].Width = 40;
+                        blocks[y, x].Height = 40;
+                        blocks[y, x].Image = Properties.Resources.removeable;
+                        blocks[y, x].Visible = true;
+                        this.Controls.Add(blocks[y, x]);
+                    }
+                    else if (map[y, x] == 2)
+                    {
+                        blocks[y, x] = new PictureBox();
+                        blocks[y, x].SizeMode = PictureBoxSizeMode.StretchImage;
+                        blocks[y, x].Location = new Point(y * 40, x * 40);
+                        blocks[y, x].Width = 40;
+                        blocks[y, x].Height = 40;
+                        blocks[y, x].Image = Properties.Resources.seorap;
+                        blocks[y, x].Visible = true;
+                        this.Controls.Add(blocks[y, x]);
+                    }
+
+
                     Bubbles[y, x] = new PictureBox();
                     Bubbles[y, x].SizeMode = PictureBoxSizeMode.StretchImage;
                     Bubbles[y, x].Location = new Point(y * 40, x * 40);
@@ -240,23 +258,7 @@ namespace newuser
                     Bubbles[y, x].Height = 40;
                     Bubbles[y, x].Image = Properties.Resources.bubble;
                     Bubbles[y, x].Visible = false;
-                    this.Controls.Add(Bubbles[y, x]);
-                }
-            for (y = 0; y < 15; ++y)
-                for (x = 0; x < 15; ++x)
-                {
-                    splash[y, x] = new PictureBox();
-                    splash[y, x].SizeMode = PictureBoxSizeMode.StretchImage;
-                    splash[y, x].Location = new Point(y * 40, x * 40);
-                    splash[y, x].Width = 40;
-                    splash[y, x].Height = 40;
-                    splash[y, x].Image = Properties.Resources.water;
-                    splash[y, x].Visible = false;
-                    this.Controls.Add(Bubbles[y, x]);
-                }
-             for (y = 0; y < 15; ++y)
-                for (x = 0; x < 15; ++x)
-                {
+
                     floooor[y, x] = new PictureBox();
                     floooor[y, x].SizeMode = PictureBoxSizeMode.StretchImage;
                     floooor[y, x].Location = new Point(y * 40, x * 40);
@@ -264,53 +266,28 @@ namespace newuser
                     floooor[y, x].Height = 40;
                     floooor[y, x].Image = Properties.Resources.floor;
                     floooor[y, x].Visible = true;
+
+                    splash[y, x] = new PictureBox();
+                    splash[y, x].SizeMode = PictureBoxSizeMode.StretchImage;
+                    splash[y, x].Location = new Point(y * 40, x * 40);
+                    splash[y, x].Width = 40;
+                    splash[y, x].Height = 40;
+                    splash[y, x].Image = Properties.Resources.water;
+                    splash[y, x].Visible = true;
+
+                    this.Controls.Add(Bubbles[y, x]);
                     this.Controls.Add(floooor[y, x]);
+                    this.Controls.Add(splash[y, x]);
                 }
+
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            hero.move(this, list, Bubbles);
+            hero.move(this, list, mymap.Bubbles);
         }
 
-        private void Form1_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Space)
-            {
-                inputdata data = list[0] as inputdata;
-                data.stat = 0;
-            }
-            else if (e.KeyCode == Keys.Right)
-            {
-                inputdata data = list[1] as inputdata;
-                data.stat = 0;
-            }
-
-            else if (e.KeyCode == Keys.Left)
-            {
-                inputdata data = list[2] as inputdata;
-                data.stat = 0;
-            }
-
-            else if (e.KeyCode == Keys.Up)
-            {
-                inputdata data = list[3] as inputdata;
-                data.stat = 0;
-            }
-
-            else if (e.KeyCode == Keys.Down)
-            {
-                inputdata data = list[4] as inputdata;
-                data.stat = 0;
-            }
-            else if (e.KeyCode == Keys.Z)
-            {
-                inputdata data = list[5] as inputdata;
-                data.stat = 0;
-            }
-        }
-
-        class hero
+        public class hero
         {
             public static PictureBox pb_hero;//사용자 캐릭터
 
@@ -320,87 +297,20 @@ namespace newuser
             public static int i_max_bubble = 1;//버블길이
             public static int i_cur_bubble = 1;
             public static int nowbubble = 0;
-            public static int dart_locationX;
-            public static int dart_locationY;
 
-            public static int[,] map = new int[15, 15] {
-            { 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0 },
-            { 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1 },
-            { 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1 },
-            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 0, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 0, 1, 2, 1, 1, 2, 2, 2, 1, 1, 2, 1, 0 ,0 },
-            { 0, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 0 },
-            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1 },
-            { 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1 },
-            { 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0 },
-            };//맵의 블럭 유무상태
 
-            public static int[,] item = new int[15, 15] {
-            { 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0 },
-            { 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1 },
-            { 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1 },
-            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 0, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 0, 1, 2, 1, 1, 2, 2, 2, 1, 1, 2, 1, 0 ,0 },
-            { 0, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 0 },
-            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1 },
-            { 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1 },
-            { 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0 },
-            };//맵의 아이템
-            static PictureBox[,] blocks = new PictureBox[15, 15];
-            int y, x;
-            
-
-        public hero(Control c_par)
-        {
-
-            i_max_bubble = 2;
-                i_cur_bubble = 0;
+            public hero(Control c)
+            {
+                i_max_bubble = 2;
 
                 pb_hero = new PictureBox();
-                pb_hero.Location = new Point(1,0);
+                pb_hero.Location = new Point(1, 0);
                 pb_hero.Size = new Size(40, 40);
                 pb_hero.Image = Properties.Resources.F;
                 pb_hero.SizeMode = PictureBoxSizeMode.StretchImage;
                 pb_hero.Visible = true;
-                c_par.Controls.Add(pb_hero);
-                for (y = 0; y < 15; ++y)
-                    for (x = 0; x < 15; ++x)
-                    {
-                        if(map[y, x]==1)
-                        {
-                            blocks[y, x] = new PictureBox();
-                            blocks[y, x].SizeMode = PictureBoxSizeMode.StretchImage;
-                            blocks[y, x].Location = new Point(y * 40, x * 40);
-                            blocks[y, x].Width = 40;
-                            blocks[y, x].Height = 40;
-                            blocks[y, x].Image = Properties.Resources.removeable;
-                            blocks[y, x].Visible = true;
-                            c_par.Controls.Add(blocks[y, x]);
-                        }
-                        else if(map[y, x]==2)
-                        {
-                            blocks[y, x] = new PictureBox();
-                            blocks[y, x].SizeMode = PictureBoxSizeMode.StretchImage;
-                            blocks[y, x].Location = new Point(y * 40, x * 40);
-                            blocks[y, x].Width = 40;
-                            blocks[y, x].Height = 40;
-                            blocks[y, x].Image = Properties.Resources.seorap;
-                            blocks[y, x].Visible = true;
-                            c_par.Controls.Add(blocks[y, x]);
-                        }
-                    }
+                c.Controls.Add(pb_hero);
+
             }
 
             public static void move(Control moveit, ArrayList list, PictureBox[,] Bubbles)
@@ -455,7 +365,7 @@ namespace newuser
                                     }
                                     else
                                     {
-                                        if (hero.pb_hero.Location.X-hero.speed>0)//블럭이 있을경우
+                                        if (hero.pb_hero.Location.X - hero.speed > 0)//블럭이 있을경우
                                         {
                                         }
                                         else
@@ -987,26 +897,104 @@ namespace newuser
             static int check_Direction()
             {
                 if (hero.pb_hero.Image == Properties.Resources.R)
-                    return 0;
-                else if (hero.pb_hero.Image == Properties.Resources.L)
                     return 1;
-                else if (hero.pb_hero.Image == Properties.Resources.B)
+                else if (hero.pb_hero.Image == Properties.Resources.L)
                     return 2;
-                else if (hero.pb_hero.Image == Properties.Resources.F)
+                else if (hero.pb_hero.Image == Properties.Resources.B)
                     return 3;
+                else if (hero.pb_hero.Image == Properties.Resources.F)
+                    return 4;
                 else
                     return 9;
             }
 
         }
-        class map
+        private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
+            if (e.KeyCode == Keys.Space)
+            {
+                inputdata data = list[0] as inputdata;
+                data.stat = 0;
+            }
+            else if (e.KeyCode == Keys.Right)
+            {
+                inputdata data = list[1] as inputdata;
+                data.stat = 0;
+            }
 
+            else if (e.KeyCode == Keys.Left)
+            {
+                inputdata data = list[2] as inputdata;
+                data.stat = 0;
+            }
+
+            else if (e.KeyCode == Keys.Up)
+            {
+                inputdata data = list[3] as inputdata;
+                data.stat = 0;
+            }
+
+            else if (e.KeyCode == Keys.Down)
+            {
+                inputdata data = list[4] as inputdata;
+                data.stat = 0;
+            }
+            else if (e.KeyCode == Keys.Z)
+            {
+                inputdata data = list[5] as inputdata;
+                data.stat = 0;
+            }
         }
+
         class inputdata
         {
             public Keys key { get; set; }
             public int stat { get; set; }
         }
+        public class map
+        {
+            public static PictureBox[,] floooor = new PictureBox[15, 15];
+            public static PictureBox[,] Bubbles = new PictureBox[15, 15];
+            public static PictureBox[,] splash = new PictureBox[15, 15];
+            public ArrayList list = new ArrayList();
+            public ArrayList midlist = new ArrayList();
+            public static ArrayList lastlist = new ArrayList();
+            public static int[,] mapInfo = new int[15, 15] {
+            { 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0 },
+            { 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0 },
+            { 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1 },
+            { 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1 },
+            { 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1 },
+            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+            { 0, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 0 },
+            { 0, 0, 1, 2, 1, 1, 2, 2, 2, 1, 1, 2, 1, 0 ,0 },
+            { 0, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 0 },
+            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+            { 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1 },
+            { 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1 },
+            { 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1 },
+            { 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0 },
+            { 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0 },
+            };//맵의 블럭 유무상태
+
+            public static int[,] item = new int[15, 15] {
+            { 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0 },
+            { 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0 },
+            { 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1 },
+            { 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1 },
+            { 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1 },
+            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+            { 0, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 0 },
+            { 0, 0, 1, 2, 1, 1, 2, 2, 2, 1, 1, 2, 1, 0 ,0 },
+            { 0, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 0 },
+            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+            { 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1 },
+            { 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1 },
+            { 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1 },
+            { 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0 },
+            { 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0 },
+            };//맵의 아이템
+            static PictureBox[,] blocks = new PictureBox[15, 15];
+        }
     }
-} 
+}
