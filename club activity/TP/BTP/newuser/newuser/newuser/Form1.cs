@@ -23,22 +23,26 @@ namespace newuser
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
 
+            inputdata list0 = list[0] as inputdata;
             inputdata list1 = list[1] as inputdata;
             inputdata list2 = list[2] as inputdata;
             inputdata list3 = list[3] as inputdata;
             inputdata list4 = list[4] as inputdata;
             inputdata list5 = list[5] as inputdata;
+            inputdata midlist0 = midlist[0] as inputdata;
             inputdata midlist1 = midlist[1] as inputdata;
             inputdata midlist2 = midlist[2] as inputdata;
             inputdata midlist3 = midlist[3] as inputdata;
             inputdata midlist4 = midlist[4] as inputdata;
             inputdata midlist5 = midlist[5] as inputdata;
+            inputdata lastlist0 = lastlist[0] as inputdata;
             inputdata lastlist1 = lastlist[1] as inputdata;
             inputdata lastlist2 = lastlist[2] as inputdata;
             inputdata lastlist3 = lastlist[3] as inputdata;
             inputdata lastlist4 = lastlist[4] as inputdata;
             inputdata lastlist5 = lastlist[5] as inputdata;
-            if (e.KeyCode == Keys.Space)
+
+            if (e.KeyCode == Keys.Space)//스페이스
             {
                 inputdata temp = list[0] as inputdata;
                 if (temp.key == e.KeyCode)
@@ -135,7 +139,7 @@ namespace newuser
             data.key = Keys.Space;
             data.stat = 0;
             list.Add(data);
-
+            
             data = new inputdata();
             data.key = Keys.Right;
             data.stat = 0;
@@ -306,7 +310,7 @@ namespace newuser
             }
         }
 
-        public class hero
+        class hero
         {
             public static PictureBox pb_hero;//사용자 캐릭터
 
@@ -365,7 +369,7 @@ namespace newuser
                 i_cur_bubble = 0;
 
                 pb_hero = new PictureBox();
-                pb_hero.Location = new Point(0, 0);
+                pb_hero.Location = new Point(1,0);
                 pb_hero.Size = new Size(40, 40);
                 pb_hero.Image = Properties.Resources.F;
                 pb_hero.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -995,7 +999,10 @@ namespace newuser
             }
 
         }
+        class map
+        {
 
+        }
         class inputdata
         {
             public Keys key { get; set; }
