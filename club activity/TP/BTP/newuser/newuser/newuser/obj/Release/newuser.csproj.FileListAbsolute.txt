@@ -19,3 +19,9 @@ C:\Users\rlaxo\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\
 C:\Users\waitle\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\bin\Release\newuser.exe.config
 C:\Users\waitle\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\obj\Release\newuser.exe
 C:\Users\waitle\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\obj\Release\newuser.pdb
+C:\Users\waitle\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\bin\Release\newuser.exe
+C:\Users\waitle\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\bin\Release\newuser.pdb
+C:\Users\waitle\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\obj\Release\newuser.csprojResolveAssemblyReference.cache
+C:\Users\waitle\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\obj\Release\newuser.Form1.resources
+C:\Users\waitle\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\obj\Release\newuser.Properties.Resources.resources
+C:\Users\waitle\OneDrive\Documents\1st-grade-sunrin\club activity\TP\BTP\newuser\newuser\newuser\obj\Release\newuser.csproj.GenerateResource.Cache
